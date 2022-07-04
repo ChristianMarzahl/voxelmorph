@@ -364,6 +364,7 @@ class VxmDenseSemiSupervisedSeg(ne.modelio.LoadableModel):
 
         # cache pointers to important layers and tensors for future reference
         self.references = ne.modelio.LoadableModel.ReferenceContainer()
+        self.references.vxm_model = vxm_model
         self.references.pos_flow = vxm_model.references.pos_flow
         self.references.neg_flow = vxm_model.references.neg_flow
 
@@ -694,7 +695,7 @@ class ProbAtlasSegmentation(ne.modelio.LoadableModel):
         if not supervised_model:
             loss_vol = KL.Lambda(lambda x: logsum(x), name='loss_vol')(logpdf)
         else:
-            loss_vol = logpdf
+            loss_vol = KL.Softmax(name='pdf')(logpdf)
 
         # initialize the keras model
         # need to swap the first two inputs, in order to warp the atlas to the image
